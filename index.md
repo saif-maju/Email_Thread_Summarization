@@ -14,8 +14,6 @@ Deep learning models have tons of applications in real world. They have reduced 
     - Extractive Summary 
     - Abstractive Summary
 2. Transfer Learning and Transformer Model
-    
-    *To be written*
 3. Dataset Description
     - Colossal Clean Crawled Corpus (C4)
     - British Columbia Conversation Corpora (BC3)   
@@ -34,7 +32,10 @@ We have applied this technique using TextRank Alogorithm which we will cover in 
 This approach is more humanly as it not only remembers key points as well as reproduces them in natural language. It is a difficult task and requires complex language modeling. This is why we use state-of-the-art T5 model to model this. 
 This will be the focus of our article. 
 
-# 2. Dataset Description
+# 2. Transfer Learning and Transformer Model
+   
+    *To be written*
+# 3. Dataset Description
 
 ## Colossal Clean Crawled Corpus (C4)
 
