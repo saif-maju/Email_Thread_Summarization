@@ -1,2 +1,2 @@
 # Email Thread Summarization with T5
-Summarize email threads through advanced NLP and Deep Learning Techniques
+Summarize email threads through transfer learning 
