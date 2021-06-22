@@ -1,4 +1,3 @@
-{{page.authors.saif}}
 
 Deep learning models have tons of applications in real world. They have reduced a lot of human effort through minimizing time consuming and repetative tasks. Modern deep learning models do not only offer efficient results, but many provide multi-purpose capacility too. 
 
@@ -8,16 +7,19 @@ Deep learning models have tons of applications in real world. They have reduced 
 
 ![T5](https://1.bp.blogspot.com/-o4oiOExxq1s/Xk26XPC3haI/AAAAAAAAFU8/NBlvOWB84L0PTYy9TzZBaLf6fwPGJTR0QCLcBGAsYHQ/s640/image3.gif)
 
-
+   *Unified Framework for All Downstream Tasks via Google AI Blog*
 # Table of Contents
 
 1. Text Summarization 
     - Extractive Summary 
     - Abstractive Summary
-2. 
-2. Dataset Description
+2. Transfer Learning and Transformer Model
+    
+    *To be written*
+3. Dataset Description
     - Colossal Clean Crawled Corpus (C4)
-    - BC3 Email Corpus   
+    - British Columbia Conversation Corpora (BC3)   
+4. Data Extraction and Preprocessing
 
 
 # 1. Text Summarization
@@ -36,9 +38,42 @@ This will be the focus of our article.
 
 ## Colossal Clean Crawled Corpus (C4)
 
-This dataset is a shortened and cleaned version of [Common Crawl Dataset](https://commoncrawl.org/). It was reduced from 20TB to just 75GB by apolying some heuristics to clean the text. It is web extracted text which contained content in HTML pages, with markup and non-text content removed. Google as used data from April 2019 for pre-training T5 and released it as part of TensorFlow Datasets.
+This dataset is a shortened and cleaned version of [Common Crawl Dataset](https://commoncrawl.org/). It was reduced from 20TB to just 75GB by apolying some heuristics to clean the text. It is web extracted text which contained content in HTML pages, with markup and non-text content removed. Google as used data from April 2019 for pre-training T5 and released it as part of [TensorFlow Datasets](https://www.tensorflow.org/datasets/).
 
-## BC3 Email Corpus 
+## British Columbia Conversation Corpora (BC3)
 This [dataset](https://www.cs.ubc.ca/cs-research/lci/research-groups/natural-language-processing/bc3.html) is a collection of 40 email threads (3222 sentences) from W3C corpus. This is prepared for summarization task, annotated by three different annotators. They provided both extractive and abstractive summaries which could be used for training the model as a target summary. A number of researchers have used this dataset for serveral NLP tasks.
 
 We will use this dataset for fine-tuning T5. Another section of this article will discuss preprocessing of this dataset. 
+
+# 4. Data Extraction and Preprocessing
+
+The dataset can be downloaded from website of [The University of British Columbia](https://www.cs.ubc.ca/cs-research/lci/research-groups/natural-language-processing/bc3.html). It is also available on our [GitHub Repo](https://github.com/saif-maju/Email_Thread_Summarization). Once downloaded, we can preprocess it in Python. 
+
+This dataset is split into two XML files. One contains the original emails split line by line, and the other contains the summaries created by the annotators. Each email may contain several summaraies from different annotators and summaries may also be over several emails. 
+
+Since emails in XML format, we need to parse them. For this we will use ElementTree package, that has functions to read and manipulate XMLs. 
+
+First, import ElementTree. It's a common practice to use the alias of ET:
+
+```
+import xml.etree.ElementTree as ET
+```
+Then you need to read in the file with ElementTree.
+
+```
+parsedXML = ET.parse( "/BC2_Email_Corpus/corpus.xml" )
+root = parsedXML.getroot()
+```
+
+
+```
+bc3_email_df = parse_bc3_emails(root)
+bc3_email_df.head(2)
+```
+Output: 
+
+|listno	| date  |	from  |	to |	subject	| body |	email_num |
+| ---   | ---   | --- | --- | --- | --- | --- |
+|0 | 007-7484738 | Tue, 08 Dec 1998 07:30:52 -0800 |	Jacob Palme	| discuss@apps.ietf.org	| Extending IETF meetings to two weeks?	| The IETF meetings tend to become too large, cr...	| 1 |
+|1	| 007-7484738 |	Wed, 09 Dec 1998 20:21:11 -0800	| Terry Allen	| discuss@apps.ietf.org,jpalme@dsv.su.se | Re: Extending IETF meetings to two weeks? |	> The IETF meetings tend to become too large, ...	| 2 |
+
