@@ -1,4 +1,12 @@
 theme: jekyll-theme-slate
 title: Email Thread Summarization with T5
 tagline: Summarize Email Threads through Transfer Learning
-author: Saifullah, Asma Damani
+authors:
+  saifullah:
+    name: Saifullah Katpar
+    display_name: saif
+    job: Data Engineer
+  asma:
+    name: Asma Rehman Ali
+    display_name: asma
+    job: Data Scientist
