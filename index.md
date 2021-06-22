@@ -1,4 +1,3 @@
-## Email Thread Summarization with T5
 
 Deep learning models have tons of applications in real world. They have reduced a lot of human effort through minimizing time consuming and repetative tasks. Modern deep learning models do not only offer efficient results, but many provide multi-purpose capacility too. 
 
