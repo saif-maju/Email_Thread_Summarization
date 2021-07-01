@@ -10,7 +10,7 @@ Deep learning models have tons of applications in real world. They have reduced 
 
 <center>
 
-   *Unified Framework for All Downstream Tasks via Google AI Blog*
+Unified Framework for All Downstream Tasks via Google AI Blog
 
 </center>
 
@@ -453,7 +453,7 @@ plt.show()
 
 <center>
 
-![word frequency](https://raw.githubusercontent.com/saif-maju/Email_Thread_Summarization/gh-pages/Word%20Frequency.png)
+![word frequency](https://github.com/saif-maju/Email_Thread_Summarization/blob/gh-pages/Word%20Frequency.png?raw=true)
 
 </center>
 
