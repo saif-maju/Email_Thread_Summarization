@@ -11,7 +11,7 @@ Deep learning models have tons of applications in real world. They have reduced 
 
    *Unified Framework for All Downstream Tasks via Google AI Blog*
 
-<center>
+</center>
 
 # Table of Contents
 
