@@ -13,13 +13,15 @@ Deep learning models have tons of applications in real world. They have reduced 
 1. Text Summarization 
     - Extractive Summary 
     - Abstractive Summary
-2. Transfer Learning and Transformer Model
-    
-    *To be written*
 3. Dataset Description
     - Colossal Clean Crawled Corpus (C4)
     - British Columbia Conversation Corpora (BC3)   
-4. Data Extraction and Preprocessing
+3. Data Extraction and Preprocessing
+4. Data Transformation
+5. Exploratory Data Analysis
+6. Applying Model
+    
+    *To be written*
 
 
 # 1. Text Summarization
@@ -45,7 +47,7 @@ This [dataset](https://www.cs.ubc.ca/cs-research/lci/research-groups/natural-lan
 
 We will use this dataset for fine-tuning T5. Another section of this article will discuss preprocessing of this dataset. 
 
-# 4. Data Extraction and Preprocessing
+# 3. Data Extraction and Preprocessing
 
 The dataset can be downloaded from website of [The University of British Columbia](https://www.cs.ubc.ca/cs-research/lci/research-groups/natural-language-processing/bc3.html). It is also available on our [GitHub Repo](https://github.com/saif-maju/Email_Thread_Summarization). Once downloaded, we can preprocess it in Python. 
 
@@ -150,42 +152,50 @@ nlp = spacy.load('en_core_web_sm')
 
 ```
 
+
 def parse_bc3_emails(root):
     '''
     This adds every BC3 email to a newly created dataframe. 
     '''
+
     BC3_email_list = []
-    #The emails are seperated by threads.
+
+    # The emails are seperated by threads.
+
     for thread in root:
         email_num = 0
-        #Iterate through the thread elements <name, listno, Doc>
+
+        # Iterate through the thread elements <name, listno, Doc>
+
         for thread_element in thread:
-            #Getting the listno allows us to link the summaries to the correct emails
-            if thread_element.tag == "listno":
+
+            # Getting the listno allows us to link the summaries to the correct emails
+
+            if thread_element.tag == 'listno':
                 listno = thread_element.text
-            #Each Doc element is a single email
-            if thread_element.tag == "DOC":
+
+            # Each Doc element is a single email
+
+            if thread_element.tag == 'DOC':
                 email_num += 1
                 email_metadata = []
-                sender = thread_element.find(".//From").text.lower()
-                subject = thread_element.find(".//Subject").text.lower()
-                email_tag = thread_element.find(".//Text")
-                        
+                sender = thread_element.find('.//From').text.lower()
+                subject = thread_element.find('.//Subject').text.lower()
+                email_tag = thread_element.find('.//Text')
                 subject_doc = nlp(subject)
-                subject = ' '.join([token.text.lower() for token in subject_doc if token.is_alpha and not token.is_punct])
-
-                #Use same enron cleaning methods on the body of the email
-                cleaned_body = clean_body(email_tag,sender)
-
+                subject = ' '.join([token.text.lower() for token in
+                                   subject_doc if token.is_alpha
+                                   and not token.is_punct])
+                cleaned_body = clean_body(email_tag, sender)
                 email_dict = {
-                    "listno" : listno,
-                    "from" : sender.split()[0],
-                    "subject" : subject,
-                    "body" : cleaned_body,
-                    "email_num": email_num
-                }
-                
-                BC3_email_list.append(email_dict)           
+                    'listno': listno,
+                    'from': sender.split()[0],
+                    'subject': subject,
+                    'body': cleaned_body,
+                    'email_num': email_num,
+                    }
+
+                BC3_email_list.append(email_dict)
     return pd.DataFrame(BC3_email_list)
 ```
 
@@ -198,24 +208,57 @@ The dataframe contains following columns:
 - Email_num: Email in thread sequence <br>
 
 
-This function uses other two helper fucntions inside it: `clean_body` and `process_date`:
+This function uses other a helper fucntion inside it: `clean_body`.
 
 *Function: clean_body*
 
 ```
-def clean_body(email_tag,sender):
-  sender_list = sender.split()
-  sender_list[-1] = sender_list[-1].replace('>','').replace('<','')
-  email_stoppers = [l for l in sender_list if len(l)>2] + ['regards','thanks', 'çheers']
-  clean_email = ''
-  for email_item in email_tag:
-    sent = nlp(email_item.text)
-    clean_sent = ' '.join([token.text.lower() for token in sent if token.is_alpha and not token.is_punct])
-    if sum([1 for word in email_stoppers if word in clean_sent and len(clean_sent.split())<=10])>=1:
-        break 
-    clean_email+=clean_sent+' '
-  return clean_email
 
+
+def parse_bc3_emails(root):
+    '''
+    This adds every BC3 email to a newly created dataframe. 
+    '''
+
+    BC3_email_list = []
+
+    # The emails are seperated by threads.
+
+    for thread in root:
+        email_num = 0
+
+        # Iterate through the thread elements <name, listno, Doc>
+
+        for thread_element in thread:
+
+            # Getting the listno allows us to link the summaries to the correct emails
+
+            if thread_element.tag == 'listno':
+                listno = thread_element.text
+
+            # Each Doc element is a single email
+
+            if thread_element.tag == 'DOC':
+                email_num += 1
+                email_metadata = []
+                sender = thread_element.find('.//From').text.lower()
+                subject = thread_element.find('.//Subject').text.lower()
+                email_tag = thread_element.find('.//Text')
+                subject_doc = nlp(subject)
+                subject = ' '.join([token.text.lower() for token in
+                                   subject_doc if token.is_alpha
+                                   and not token.is_punct])
+                cleaned_body = clean_body(email_tag, sender)
+                email_dict = {
+                    'listno': listno,
+                    'from': sender.split()[0],
+                    'subject': subject,
+                    'body': cleaned_body,
+                    'email_num': email_num,
+                    }
+
+                BC3_email_list.append(email_dict)
+    return pd.DataFrame(BC3_email_list)
 ```
 This function takes email tag element and sender (From tag) as input and returns cleaned body, with extra text, such as signature removed. For extracting signature from an email by limiting emails to the first occurence of any `email_stopper`. Here we use SpaCY package to apply following operations:
 
@@ -235,7 +278,7 @@ bc3_email_df.head(2)
 |listno |	from  |	subject	| body |	email_num |
 | ---   | ---   | --- | --- | --- |
 | 007-7484738 |	jacob| Extending IETF meetings to two weeks?	| the ietf meetings tend to become too large cre...		| 1 |
-| 007-7484738 | Terry Allen | re extending ietf meetings to two weeks	 |	the ietf meetings tend to become too large cre...	| 2 |
+| 007-7484738 | terry | re extending ietf meetings to two weeks	 |	the ietf meetings tend to become too large cre...	| 2 |
 | |
 
 
@@ -297,7 +340,6 @@ Using this function, we parse summaries, load in a dataframe `bc3_summary_df` an
 ```
 #Load summaries and process
 parsedXML = ET.parse( "/BC2_Email_Corpus/annotation.xml" )
-
 root = parsedXML.getroot()
 
 bc3_summary_df = parse_bc3_summaries(root)
@@ -313,12 +355,17 @@ bc3_df.head(2)
 
 |listno	|	from  |	subject	| body |	email_num | annotator | summary |
 | ---   | --- | --- | --- | --- | --- | --- | 
-| 007-7484738 |	Jacob Palme	| Extending IETF meetings to two weeks?	| The IETF meetings tend to become too large, cr...	| 1 | Annotator3-Part2 | Jacob suggested to hold two week meetings, the... |
-| 007-7484738 | Terry Allen	| Re: Extending IETF meetings to two weeks? |	> The IETF meetings tend to become too large, ...	| 2 | Annotator2-Part2 | Jacob suggested to hold two week meetings, the... |
+| 007-7484738 |	jacob | extending ietf meetings to two weeks	| the ietf meetings tend to become too large cre...	| 1 | Annotator3-Part2 | Jacob suggested to hold two week meetings, the... |
+| 007-7484738 | terry	| extending ietf meetings to two weeks |	the ietf meetings tend to become too large cre...	| 2 | Annotator2-Part2 | Jacob suggested to hold two week meetings, the... |
 |     |
 
 
-We have got `annotator` and `summary` columns in `bc3_df` dataframe. Since we have two or three summaries for each email, we pick only first summary for each email. 
+
+# 4. Data Transformation
+
+## Group By Thread Number and Email Number
+
+  We have got `annotator` and `summary` columns in `bc3_df` dataframe. Since we have two or three summaries for each email, we pick only first summary for each email. 
 
 ```
 emails_df=bc3_df.groupby(['listno','email_num']).first()
@@ -339,7 +386,101 @@ emails_df.head()
 | |
 
 
+<br>
 
+## Include Author in Email Body
+
+For considering who sent the email in order to maintain the context of an author, we include author name in the actual email. 
+
+```
+emails_df['email'] = emails_df['from'] + ' said ' + emails_df['body']
+emails_df.head(2)
+```
+<br>
+
+*Output:* 
+
+|listno	|	from  |	subject	| body |	email_num | annotator | summary |
+| ---   | --- | --- | --- | --- | --- | --- | 
+| 007-7484738 |	jacob | extending ietf meetings to two weeks	| jacob said the ietf meetings tend to become too large cre...	| 1 | Annotator3-Part2 | Jacob suggested to hold two week meetings, the... |
+| 007-7484738 | terry	| extending ietf meetings to two weeks |	terry said the ietf meetings tend to become too large cre...	| 2 | Annotator2-Part2 | Jacob suggested to hold two week meetings, the... |
+|     |
+
+
+## Select Useful Columns
+
+For our task, we only require only following columns: 
+
+```
+emails_df = emails_df[['listno','email_num','email','summary']]
+```
+
+## Concat Emails to Form Threads
+
+Since we wish to train our model on threads, rather than individual emails, we combine them to form continuous threads.
+
+```
+emails_df = emails_df.set_index('listno')
+threads_df = pd.DataFrame(index=emails_df.index.unique())
+threads_df['thread'] = emails_df.groupby('listno')['email'].transform(lambda x : ' '.join(x)).drop_duplicates()
+threads_df['summary'] = emails_df.groupby('listno')['summary'].transform(lambda x : ' '.join(x)).drop_duplicates()
+threads_df = threads_df.reset_index()
+threads_df.head(2)
+```
+# 5. Exploratory Data Analysis
+
+**Email Thread**
+
+For understanding of our text, we peform some exploratory data analysis. 
+
+```
+import matplotlib.pyplot as plt
+email_word_count = pd.Series([len(i.split()) for i in threads_df.thread])
+email_word_count.hist(bins = 30)
+plt.xlabel('Word Count')
+plt.ylabel('Frequency')
+plt.title('Email Word Frequency')
+plt.show()
+```
+
+*Output:*
+
+<center>
+
+![word frequency](https://raw.githubusercontent.com/saif-maju/Email_Thread_Summarization/gh-pages/Word%20Frequency.png)
+
+</center>
+
+Further, the minimum and maximum of the words in email are:
+
+```
+print('Max words: ',max(email_word_count))
+print('Avg words: ',sum(email_word_count)/len(email_word_count))
+```
+*Output:*
+
+```
+Max words:  846
+Avg words:  468.87179487179486
+```
+
+**Summary**
+
+
+
+
+# 6. Applying Model
+
+This is the most important part. Data we have prepared will now be formalized into a suitable format for the model. We will create a *Dataset* class for data loading, a *FineTuner* class for training over pre-trained model, then use the trained model to make predictions, that is generate summaries.
+
+## Split Data
+We have 39 threads. We use first 31 threads for training, 4 threads for validation, and the last 4 emails for testing. 
+
+```
+train = email_df.iloc[:32]
+val = email_df.iloc[32:36]
+test = email_df.iloc[36:40] 
+```
 
 
 
