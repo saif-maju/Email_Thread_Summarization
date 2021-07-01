@@ -5,9 +5,10 @@ Deep learning models have tons of applications in real world. They have reduced 
  
  
 
-<center>
 
 ![T5](https://1.bp.blogspot.com/-o4oiOExxq1s/Xk26XPC3haI/AAAAAAAAFU8/NBlvOWB84L0PTYy9TzZBaLf6fwPGJTR0QCLcBGAsYHQ/s640/image3.gif)
+
+<center>
 
    *Unified Framework for All Downstream Tasks via Google AI Blog*
 
